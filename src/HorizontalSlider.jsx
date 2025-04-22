@@ -30,7 +30,11 @@ const HorizontalSlider = () => {
 </linearGradient>
 </defs>
 </svg>
-`
+`,
+      gradientColors: {
+        primary: '#F76487',  // Pink
+        secondary: '#2AEB8D' // Green
+      }
     },
     { 
       id: 1, 
@@ -59,7 +63,11 @@ const HorizontalSlider = () => {
 </linearGradient>
 </defs>
 </svg>
-`
+`,
+      gradientColors: {
+        primary: '#EE7D4D',  // Orange
+        secondary: '#01FFE1' // Cyan
+      }
     },
     { 
       id: 2, 
@@ -88,7 +96,11 @@ const HorizontalSlider = () => {
 <stop offset="1" stop-color="#FF8C3A"/>
 </linearGradient>
 </defs>
-</svg>`
+</svg>`,
+      gradientColors: {
+        primary: '#89007E',   // Purple
+        secondary: '#FF8C3A'  // Orange
+      }
     },
   ];
   
@@ -166,8 +178,40 @@ const HorizontalSlider = () => {
     };
   }, []);
 
+  // Get current gradient colors
+  const { primary, secondary } = sections[currentSection].gradientColors;
+
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden bg-black text-white flex flex-col">
+      {/* Animated Gradient Background - changes with current section */}
+      <div 
+        className="fixed inset-0 w-full h-full z-0 transition-opacity duration-1000" 
+        style={{
+          background: `radial-gradient(circle at 50% 50%, ${primary}33 0%, transparent 50%), 
+                      radial-gradient(circle at 80% 20%, ${secondary}33 0%, transparent 40%)`,
+          opacity: 0.8,
+        }}
+      >
+        {/* Glowing gradient orbs */}
+        <div 
+          className="absolute rounded-full glow-orb-1" 
+          style={{
+            background: `radial-gradient(circle at center, ${primary} 0%, transparent 70%)`,
+            width: '300px',
+            height: '300px',
+          }}
+        ></div>
+        
+        <div 
+          className="absolute rounded-full glow-orb-2" 
+          style={{
+            background: `radial-gradient(circle at center, ${secondary} 0%, transparent 70%)`,
+            width: '200px',
+            height: '200px',
+          }}
+        ></div>
+      </div>
+      
       {/* Logo Header - fixed position outside of slide content */}
       <header className="fixed top-6 left-6 z-40">
         <div className="flex items-center gap-2">
@@ -202,7 +246,7 @@ const HorizontalSlider = () => {
       {/* Sections Slider */}
       <div 
         ref={sliderRef}
-        className="flex h-full w-full transition-transform duration-700 ease-in-out"
+        className="flex h-full w-full transition-transform duration-700 ease-in-out z-10"
         style={{ transform: `translateX(-${currentSection * 100}%)` }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -211,18 +255,36 @@ const HorizontalSlider = () => {
         {sections.map((section) => (
           <div 
             key={section.id}
-            className="flex min-w-full h-full flex-col items-center justify-center bg-black px-4 md:px-8"
+            className="flex min-w-full h-full flex-col items-center justify-center px-4 md:px-8"
           >
-            <div className="flex flex-col md:flex-row items-center justify-center gap-8 max-w-6xl mx-auto">
-              {/* SVG on the left */}
-              <div className="w-full md:w-1/2 lg:w-2/5 mb-6 md:mb-0" dangerouslySetInnerHTML={{ __html: section.svg }} />
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8 max-w-6xl mx-auto">
+              {/* SVG on the left with glow effect - adjusted positioning and size */}
+              <div className="w-full md:w-2/5 mb-6 md:mb-0 relative md:mr-12">
+                <div 
+                  className="absolute inset-0 filter blur-xl opacity-60"
+                  style={{
+                    background: `radial-gradient(circle at center, ${section.gradientColors.primary}99 0%, transparent 70%)`,
+                    transform: 'scale(0.9)',
+                    animation: 'pulse 4s infinite'
+                  }}
+                ></div>
+                <div 
+                  dangerouslySetInnerHTML={{ __html: section.svg }} 
+                  className="relative z-10 transform scale-90" // Reduced size with scale transform
+                />
+              </div>
               
               {/* Content with glassmorphism effect */}
-              <div className="w-full md:w-1/2 lg:w-3/5 text-center md:text-left">
-                <div className="backdrop-blur-md bg-white/10 rounded-xl p-6 border border-white/20 shadow-xl">
+              <div className="w-full md:w-3/5 text-center md:text-left">
+                <div className="backdrop-blur-md bg-black/30 rounded-xl p-6 border border-white/20 shadow-xl">
                   <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">{section.title}</h2>
                   <p className="text-base md:text-lg text-gray-200 mb-6">{section.content}</p>
-                  <button className="px-6 py-2 bg-white text-black font-medium rounded-md hover:bg-opacity-90 transition-all">
+                  <button 
+                    className="px-6 py-2 bg-white/10 backdrop-blur-sm border border-white/40 text-white font-medium rounded-md hover:bg-white/20 transition-all"
+                    style={{
+                      boxShadow: `0 0 20px ${section.gradientColors.primary}66`
+                    }}
+                  >
                     Pelajari Lebih Lanjut
                   </button>
                 </div>
@@ -253,8 +315,46 @@ const HorizontalSlider = () => {
         </svg>
       </button>
       
-      {/* Custom CSS for text-shadow-glow class */}
+      {/* Custom CSS for animations and effects */}
       <style jsx>{`
+        @keyframes pulse {
+          0% { opacity: 0.4; transform: scale(0.9); }
+          50% { opacity: 0.7; transform: scale(1.05); }
+          100% { opacity: 0.4; transform: scale(0.9); }
+        }
+
+        @keyframes float {
+          0% { transform: translateY(0) translateX(0); }
+          25% { transform: translateY(-15px) translateX(15px); }
+          50% { transform: translateY(0) translateX(30px); }
+          75% { transform: translateY(15px) translateX(15px); }
+          100% { transform: translateY(0) translateX(0); }
+        }
+
+        @keyframes float2 {
+          0% { transform: translateY(0) translateX(0); }
+          25% { transform: translateY(15px) translateX(-15px); }
+          50% { transform: translateY(30px) translateX(0); }
+          75% { transform: translateY(15px) translateX(15px); }
+          100% { transform: translateY(0) translateX(0); }
+        }
+
+        .glow-orb-1 {
+          top: 20%;
+          left: 15%;
+          opacity: 0.6;
+          filter: blur(70px);
+          animation: float 15s ease-in-out infinite;
+        }
+
+        .glow-orb-2 {
+          bottom: 15%;
+          right: 10%;
+          opacity: 0.6;
+          filter: blur(70px);
+          animation: float2 20s ease-in-out infinite;
+        }
+
         .text-shadow-glow {
           text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
         }
